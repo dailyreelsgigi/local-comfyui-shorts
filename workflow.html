@@ -14,34 +14,35 @@ th{background:#f2f5f8}
 li{margin:4px 0}
 hr{margin:28px 0;border:none;border-top:1px solid #ddd}
 </style>
-<body><h1>本地 ComfyUI 造一條 46 秒粵語短劇（可複製 workflow）</h1>
-<h2>成品規格</h2>
-<li>5 條 clip，每條 3–6 鏡，1088×608，24fps，全片 46.7 秒</li>
-<li>對白同配樂全部本地生成：MiniMax H3 Ref2VA（畫面＋原生粵語聲）、ACE-Step 1.5 XL Turbo（BGM）</li>
-<li>後製全部 ffmpeg：剪靜音、燒字幕、BGM ducking、fade to black</li>
-<h2>環境</h2>
-<li>ComfyUI（本地），H3 Ref2VA 節點（T8 Hybrid：ReferenceToVideo + AddGuide）</li>
-<li>模型：acestep_v1.5_xl_turbo_bf16 / qwen_0.6b_ace15 / qwen_4b_ace15 / ace_1.5_vae</li>
-<li>每條 360 幀 clip 本機約 13 分鐘</li>
-<h2>七步流程</h2>
-<li><strong>劇本</strong>：每句 ≤13 個中文字，1 句＝1 鏡</li>
-<li><strong>角色 ref</strong>：一人一份 turnaround（1 張證件相＋正／側／背全身），餵原檔唔裁</li>
-<li><strong>空場景板</strong>：每個場地先出一張零人物、零人影嘅板（<code>Nobody is anywhere in the frame, no people, no hands, no figures, no shadows of people.</code>），之後每鏡都用同一塊</li>
-<li><strong>每條 clip 一個六節式 prompt</strong>：subject_definitions／summary／retention_analysis／detailed_description／overall_soundscape／non_diegetic_music</li>
-<li><strong>submit</strong>：360 幀（15 秒）一條，逐條出</li>
-<li><strong>剪靜音＋燒字幕</strong>：<code>silencedetect</code> 找對白區間，前後各留 0.2 秒</li>
-<li><strong>BGM＋轉場</strong>：ACE-Step 出 60 秒 instrumental，ducking 落對白下面，轉場 0.4 秒 fade to black</li>
-<h2>關鍵數字（實測）</h2>
+<body><h1>Making a 46-second Cantonese short entirely in local ComfyUI</h1>
+<p>Documentation in English. The film itself is in Cantonese (burned-in subtitles).</p>
+<h2>What came out</h2>
+<li>5 clips, 3–6 shots each, 1088×608, 24 fps, 46.7 s total</li>
+<li>Dialogue and score generated locally: MiniMax H3 Ref2VA (picture + native Cantonese voice), ACE-Step 1.5 XL Turbo (BGM)</li>
+<li>All post in ffmpeg: silence trimming, subtitle burn, BGM ducking, fade to black</li>
+<h2>Environment</h2>
+<li>ComfyUI, local; H3 Ref2VA nodes (T8 Hybrid: ReferenceToVideo + AddGuide)</li>
+<li>Models: acestep_v1.5_xl_turbo_bf16, qwen_0.6b_ace15, qwen_4b_ace15, ace_1.5_vae</li>
+<li>One 360-frame clip ≈ 13 minutes on this machine</li>
+<h2>The seven steps</h2>
+<li><strong>Script</strong> — max 13 Chinese characters per line, one line per shot</li>
+<li><strong>Character refs</strong> — one turnaround sheet per person (one ID shot + full-body front/side/back); feed the original file, never a crop</li>
+<li><strong>Empty scene plate</strong> — generate one clean plate per location first (<code>Nobody is anywhere in the frame, no people, no hands, no figures, no shadows of people.</code>), then reuse that same plate in every shot</li>
+<li><strong>One six-section prompt per clip</strong> — subject_definitions / summary / retention_analysis / detailed_description / overall_soundscape / non_diegetic_music</li>
+<li><strong>Submit</strong> — 360 frames (15 s) per clip, one at a time</li>
+<li><strong>Trim silence + burn subtitles</strong> — <code>silencedetect</code> to find speech spans, keep 0.2 s either side</li>
+<li><strong>BGM + transitions</strong> — ACE-Step 60 s instrumental, ducked under dialogue; 0.4 s fade to black at scene changes</li>
+<h2>The numbers that matter (measured)</h2>
 <table>
-<tr><th>項目</th><th>數值</th></tr>
-<tr><td>單條上限</td><td>15.08 秒（360–362 幀）</td></tr>
-<tr><td>語速</td><td>**4–5 字／秒**（÷4.4 定秒數；&gt;5 字／秒開始吞尾字）</td></tr>
-<tr><td>一鏡長度</td><td>約 3 秒；同一場戲放同一條 clip</td></tr>
-<tr><td>首幀錨</td><td>有錨鎖死切點（2 刀）；3 秒一鏡要關錨（5 刀）</td></tr>
-<tr><td>ref 拉力</td><td>`ref_image_size=match` → `max`</td></tr>
-<tr><td>BGM</td><td>對白段低 20dB；冇對白自動 +3dB（sidechain）</td></tr>
+<tr><th>Item</th><th>Value</th></tr>
+<tr><td>Per-clip ceiling</td><td>15.08 s (360–362 frames)</td></tr>
+<tr><td>Speech rate</td><td>**4–5 characters/sec** (seconds = chars ÷ 4.4; above 5 the endings get swallowed)</td></tr>
+<tr><td>Shot length</td><td>~3 s; keep one scene inside one clip</td></tr>
+<tr><td>First-frame anchor</td><td>With anchor: cuts are locked to 2; for 3-second shots turn the anchor off (5 cuts)</td></tr>
+<tr><td>Reference pull</td><td>`ref_image_size=match` → `max`</td></tr>
+<tr><td>BGM</td><td>20 dB under dialogue; +3 dB automatically when nobody is speaking (sidechain)</td></tr>
 </table>
-<h2>Prompt 骨架（英文，直接抄）</h2>
+<h2>Prompt skeleton (copy as-is)</h2>
 <pre><code>
 [reference generation]
 &lt;Picture 1&gt; is a turnaround sheet of the woman &lt;Subject 1&gt;: ...
@@ -69,12 +70,12 @@ Only two voices and the location sound: distant traffic, the hum of the ceiling 
 non_diegetic_music:
 No music at all in this video.
 </code></pre>
-<h2>ffmpeg 鏈（實際用過）</h2>
+<h2>ffmpeg chain (actually used)</h2>
 <pre><code>
-# 1) 剪走死空氣，每句前後留 0.2 秒
+# 1) find dead air; keep 0.2 s either side of each line
 ffmpeg -i in.mp4 -af silencedetect=noise=-35dB:d=0.3 -f null -
 
-# 2) BGM 落對白下面，冇對白 +3dB（sidechain ducking）
+# 2) BGM under dialogue, +3 dB when nobody speaks (sidechain ducking)
 ffmpeg -y -i film.mp4 -i bgm.mp3 -filter_complex \
  &#x27;[0:a]aformat=sample_rates=32000:channel_layouts=stereo,asplit=2[sp][main];\
   [1:a]aformat=sample_rates=32000:channel_layouts=stereo,volume=-1dB,afade=t=in:st=0:d=2,afade=t=out:st=42.5:d=4[bg];\
@@ -82,14 +83,14 @@ ffmpeg -y -i film.mp4 -i bgm.mp3 -filter_complex \
   [main][duck]amix=inputs=2:duration=first:normalize=0[a]&#x27; \
  -map 0:v -map &#x27;[a]&#x27; -c:v libx264 -crf 18 -pix_fmt yuv420p -c:a aac -b:a 192k out.mp4
 
-# 3) 轉場 fade to black：逐段 fade out/in 再 concat（唔好一條 filter 鏈加多個 fade，
-#    因為 fade=t=in 會將 st 之前全部變黑）
+# 3) fade to black at scene changes: fade each segment&#x27;s tail/head, then concat.
+#    Do NOT chain several fade filters on one file — fade=t=in blacks out everything before st.
 </code></pre>
-<h2>五個踩過嘅坑</h2>
-<li><strong>對白落錯人</strong>：講者唔入鏡，模型會將對白塞落鏡內人個口。要麼講者入鏡（側面／背影都算），要麼明文 <code>only his voice is heard, her lips stay closed</code></li>
-<li><strong>分身</strong>：寫「他的側面填左邊」會令模型畫多一個男人。單人鏡用 <code>Only one person is in this frame, no shoulder, no arm, no hand</code></li>
-<li><strong>背景飄</strong>：同一場每一鏡要逐字相同嘅場景描述；空場景板要餵正確嗰塊（錯餵街景板＝背景變咗另一個地方）</li>
-<li><strong>語速</strong>：模型會自己趕（實測去過 8 字／秒）。prompt 寫慢都未必聽，最終以實測字／秒驗，超標就重出</li>
-<li><strong>字幕</strong>：一定要喺最終時間軸按「每鏡窗」偵測短句再燒，唔可以逐條片各自燒完先拼（剪走靜音之後全部會歪）</li>
+<h2>Five things that bit me</h2>
+<li><strong>Line lands on the wrong person</strong> — if the speaker is off frame, the model puts the line in the listener&#x27;s mouth. Either keep the speaker in frame (profile or over-the-shoulder counts) or state <code>only his voice is heard, her lips stay closed</code>.</li>
+<li><strong>Duplicates</strong> — &quot;his profile fills the left edge&quot; makes the model draw a second man. For solo shots write <code>Only one person is in this frame, no shoulder, no arm, no hand</code>.</li>
+<li><strong>Drifting background</strong> — the scene description must be word-for-word identical in every shot, and you must feed the right empty plate (feeding the street plate instead of the bridge plate changes the location).</li>
+<li><strong>Speech rate</strong> — the model rushes on its own (measured 8 chars/sec in one take) and often ignores a &quot;slow down&quot; instruction. Verify by measuring chars ÷ seconds and re-render if it is over.</li>
+<li><strong>Subtitles</strong> — detect speech per shot window on the final timeline, never burn each clip separately before joining (trimming silence afterwards throws every cue off).</li>
 <hr>
-<p>作者：Gigi page｜全部片段、模型、後製均在本機完成</p></body></html>
+<p>By the Gigi page. Every shot, model and edit ran on this machine.</p></body></html>

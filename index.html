@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="zh-Hant">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>本地 ComfyUI 造片 — 作品同 workflow</title>
+<title>Local ComfyUI — a 46-second Cantonese short</title>
 <style>
  body{margin:0;background:#101014;color:#e8e6e3;font:16px/1.7 -apple-system,"Segoe UI","Microsoft JhengHei",sans-serif}
  main{max-width:760px;margin:0 auto;padding:48px 20px 80px}
@@ -19,22 +19,22 @@
 </style>
 </head>
 <body><main>
-<h1>用本地 ComfyUI 造一條 46 秒粵語短劇</h1>
-<p class="sub">MiniMax H3 Ref2VA + ACE-Step，全部本機跑；配樂、字幕、剪接用 ffmpeg。</p>
+<h1>A 46-second Cantonese short, made entirely in local ComfyUI</h1>
+<p class="sub">MiniMax H3 Ref2VA for picture and native voice, ACE-Step for the score, ffmpeg for everything after. Shot, cut and mixed on one machine.</p>
 
 <video controls preload="metadata" src="nightout_EP1.mp4"></video>
-<p class="meta">《今晚去邊》EP1 ・ 46.7s ・ 1088×608 ・ 24fps ・ 5 條 clip</p>
+<p class="meta">《今晚去邊》EP1 · 46.7s · 1088×608 · 24fps · 5 clips · burned-in Cantonese subtitles</p>
 
-<a class="btn" href="workflow.html">睇完整 workflow →</a>
+<a class="btn" href="workflow.html">Full workflow notes →</a>
 
-<h2 style="font-size:20px;margin-top:40px">入面有咩</h2>
+<h2 style="font-size:20px;margin-top:40px">What's in the notes</h2>
 <ul>
- <li>七步流程（劇本 → 角色 ref → 空場景板 → prompt → 出片 → 剪片 → 混音）</li>
- <li>關鍵數字：15.08s 上限、每鏡 4–5 字／秒、有錨 2 刀／無錨 5 刀</li>
- <li>Prompt 六節式骨架（可直接複製）</li>
- <li>ffmpeg 鏈：剪靜音、燒粵語字幕、BGM ducking、fade to black</li>
- <li>五個我踩過嘅坑</li>
+ <li>The seven steps: script → character refs → empty scene plate → prompt → render → cut → mix</li>
+ <li>The numbers: 15.08s per-clip ceiling, 4–5 characters/sec, 2 cuts with an anchor vs 5 without</li>
+ <li>The six-section prompt skeleton, copy-paste ready</li>
+ <li>ffmpeg chains: silence trimming, Cantonese subtitle burn, BGM ducking, fade to black</li>
+ <li>Five mistakes I made, and what fixed them</li>
 </ul>
 
-<footer>有問題可以喺原 post 留言，我會覆。</footer>
+<footer>Questions? Reply on the original post and I'll answer.</footer>
 </main></body></html>
